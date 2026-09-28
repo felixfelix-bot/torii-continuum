@@ -1,0 +1,62 @@
+# Continuum
+
+An app builder, project engine and marketplace for bot work — a gateway into the Torii ecosystem.
+
+Continuum treats every project like a nostr identity: portable, signable, yours. Projects, sessions, milestones, todos, and files are all shaped as nostr events (addressable kinds 30078–30082). MVP stores them in `localStorage`; the same objects flip to signed relay events without re-shaping.
+
+## What's here (v0.2.0-alpha)
+
+**Frontend (`src/`)**
+
+- **Landing page** at `#/` — marketing surface with the sovereignty story, torii-arch hero, promises grid, freedom-tech pillars, live status roadmap. Click through to the demo, or Login with Nostr.
+- **Projects** — list, create, open. Import from GitHub or ngit. Cascades to sessions/milestones/todos/files.
+- **Project home** — milestones ladder, session log, live todo list, files created.
+- **Marketplace** — open AI-work tasks. Yours highlighted amber.
+- **Routstr** — real Cashu wallet top-up when an agent is configured; mock behaviour on demo builds. Default coding model: DeepSeek-Coder-V2. Default chat model: DeepSeek Chat.
+- **Dashboard** — cross-project oversight rundown.
+- **AI chat dock** — routes through your agent (POST /api/chat) when signed in; falls back to mock replies otherwise.
+- **NIP-07 login** — sidebar button opens a Plebeian Signer flow, signs a kind 22242 challenge, and stores the returned session token locally.
+
+**Agent (`agent/`, Node 20 + Fastify)**
+
+A small daemon designed for one operator, one VPS, one npub. Owns:
+
+- NIP-07 login verification (no nsec ever touches the VPS)
+- Cashu wallet float on disk (`memory/wallet/`, mode 0600)
+- Routstr chat calls (OpenAI-compat, DeepSeek-Chat by default, DeepSeek-Coder-V2 for coding, configurable fallback ladder, one Cashu token per request)
+
+See `agent/README.md` for the VPS bring-up runbook and `agent/PRIVACY.md` for the invariants.
+
+## Data shape (draft, not a NIP)
+
+| Kind    | Purpose                          | `d` tag                    |
+| ------- | -------------------------------- | -------------------------- |
+| 30078   | Project                          | `<slug>`                   |
+| 30079   | Session                          | `<slug>:<session-id>`      |
+| 30080   | Milestone                        | `<slug>:m<index>`          |
+| 30081   | Todo                             | `<slug>:<todo-id>`         |
+| 30082   | File reference                   | `<slug>:<path>`            |
+| 30090   | Marketplace task listing         | task id                    |
+| 30091   | Routstr wallet + prefs           | `default`                  |
+
+## Dev
+
+```bash
+npm install
+npm run dev       # http://127.0.0.1:5180
+npm run build     # → dist/
+npm run preview   # serve dist/
+```
+
+## Roadmap
+
+- M1 ✅ App shell + navigation
+- M2 ✅ Projects + project home
+- M3 ✅ Routstr + marketplace shells
+- M4 ✅ NIP-07 signer, agent scaffold, landing page (v0.2.0-alpha)
+- M5  Local Ollama fallback, brain.write + todo.patch skills
+- M6  Nostr event publishing (gift-wrap-only), own relay + sync
+
+## Related
+
+- [Torii Quest](https://torii-quest.pplx.app) — the open-world arena shooter and Continuum's first surface.
